@@ -4,6 +4,11 @@
 
 (def filename (atom nil))
 
+(defn- physical-to-pixel [[width height] [xmin ymin] diam]
+  (fn [[x y]]
+    [(* (/ (- x xmin) diam) width)
+     (* (- 1.0 (/ (- y ymin) diam)) height)]))
+
 (defn draw []
   (q/background 255)
   (let [{:keys [x y edges]} (mesh/read-poly @filename)]
@@ -11,12 +16,11 @@
           ymin (apply min y)
           diam (max (- (apply max x) xmin)
                     (- (apply max y) ymin))]
-      (letfn [(f [t] (* (/ (- t xmin) diam) (q/width)))
-              (g [t] (* (/ (- t ymin) diam) (q/height)))]
+      (let [f (physical-to-pixel [(q/width) (q/height)] [xmin ymin] diam)]
         (doseq [k (range 0 (count edges))]
           (let [[i j] (get edges k)]
-            (q/line [(f (get x i)) (g (get y i))]
-                    [(f (get x j)) (g (get y j))])))))))
+            (q/line (f [(get x i) (get y i)])
+                    (f [(get x j) (get y j)]))))))))
 
 (q/defsketch draw-mesh
   :size [300 300]
