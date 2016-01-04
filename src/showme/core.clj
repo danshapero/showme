@@ -11,7 +11,7 @@
 
 (defn draw []
   (q/background 255)
-  (let [{:keys [x y edges]} (mesh/read-poly @filename)]
+  (let [{:keys [x y edges]} (mesh/read-mesh @filename)]
     (let [xmin (apply min x)
           ymin (apply min y)
           diam (max (- (apply max x) xmin)
