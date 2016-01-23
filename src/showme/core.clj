@@ -1,6 +1,7 @@
 (ns showme.core
   (:require [quil.core :as q]
-            [showme.mesh :as mesh]))
+            [showme.mesh :as mesh])
+  (:import java.awt.event.KeyEvent))
 
 (def filename (atom nil))
 
@@ -22,9 +23,15 @@
             (q/line (f [(get x i) (get y i)])
                     (f [(get x j) (get y j)]))))))))
 
+(defn key-press []
+  (let [raw-key (q/raw-key)]
+    (when (= KeyEvent/VK_ESCAPE raw-key)
+      (q/exit))))
+
 (q/defsketch draw-mesh
   :size [300 300]
-  :draw draw)
+  :draw draw
+  :key-pressed key-press)
 
 (defn -main [& args]
   (reset! filename (first args)))
